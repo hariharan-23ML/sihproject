@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Settings</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="index.html">🏠 Dashboard</a>
+    <a href="reported-issues.html">🐞 Reported Issues</a>
+    <a href="live-map.html">🗺️ Live Map</a>
+    <a href="task-assignment.html">📋 Task Assignment</a>
+    <a href="resolved-reports.html">✅ Resolved Reports</a>
+    <a href="admin-settings.html" class="active">⚙️ Settings</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+    <header><h1>Admin Settings</h1></header>
+    <div class="container">
+      <div class="card">
+        <h3>Profile</h3>
+        <p>Change password, update info.</p>
+        <form id="profileForm">
+          <input type="text" id="adminName" placeholder="Admin Name"><br>
+          <input type="email" id="adminEmail" placeholder="Admin Email"><br>
+          <input type="password" id="newPassword" placeholder="New Password"><br>
+          <button type="submit">Update Profile</button>
+        </form>
+        <p id="profileMsg"></p>
+      </div>
+
+      <div class="card">
+        <h3>System Settings</h3>
+        <p>Manage departments, users.</p>
+        <form id="deptForm">
+          <input type="text" id="deptName" placeholder="Department Name" required>
+          <button type="submit">Add Department</button>
+        </form>
+        <ul id="deptList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { updatePassword, updateEmail } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    // Profile Update
+    const profileForm = document.getElementById("profileForm");
+    const profileMsg = document.getElementById("profileMsg");
+
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) {
+        profileMsg.textContent = "❌ No authenticated user.";
+        return;
+      }
+
+      const name = document.getElementById("adminName").value.trim();
+      const email = document.getElementById("adminEmail").value.trim();
+      const newPass = document.getElementById("newPassword").value;
+
+      try {
+        if (email) await updateEmail(user, email);
+        if (newPass) await updatePassword(user, newPass);
+        // Optional: update name in Firestore / profile collection
+        profileMsg.textContent = "✅ Profile updated successfully!";
+      } catch (err) {
+        profileMsg.textContent = "❌ Error: " + (err.message || err);
+      }
+    });
+
+    // Department Management
+    const deptForm = document.getElementById("deptForm");
+    const deptList = document.getElementById("deptList");
+
+    deptForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const deptName = document.getElementById("deptName").value.trim();
+      if (!deptName) return;
+
+      try {
+        await addDoc(collection(db, "departments"), { name: deptName });
+        document.getElementById("deptName").value = "";
+      } catch (err) {
+        console.error("Add department error:", err);
+        alert("Failed to add department");
+      }
+    });
+
+    // Live list of departments
+    onSnapshot(collection(db, "departments"), (snap) => {
+      deptList.innerHTML = "";
+      if (snap.empty) {
+        deptList.innerHTML = "<li>No departments yet</li>";
+        return;
+      }
+      snap.forEach(d => {
+        const li = document.createElement("li");
+        li.textContent = d.data().name;
+        deptList.appendChild(li);
+      });
+    }, (err) => console.error("Department snapshot error:", err));
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>

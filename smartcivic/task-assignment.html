@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Assignment</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="index.html">🏠 Dashboard</a>
+    <a href="reported-issues.html">🐞 Reported Issues</a>
+    <a href="live-map.html">🗺️ Live Map</a>
+    <a href="task-assignment.html" class="active">📋 Task Assignment</a>
+    <a href="resolved-reports.html">✅ Resolved Reports</a>
+    <a href="admin-settings.html">⚙️ Settings</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+    <header><h1>Task Assignment</h1></header>
+    <div class="container" id="tasks-container">
+      <p>Loading tasks...</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase.js";
+    import { collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    const tasksContainer = document.getElementById("tasks-container");
+
+    function createTaskCard(docSnap) {
+      const id = docSnap.id;
+      const data = docSnap.data();
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const title = data.title || "Untitled";
+      const location = data.location ? `${data.location.lat || ""}, ${data.location.lng || ""}` : "Unknown location";
+      const status = data.status || "Submitted";
+      const assigned = data.assignedTo || "";
+
+      card.innerHTML = `
+        <h3>${title}</h3>
+        <p>${location} – <strong>${status}</strong></p>
+        <label for="dept-${id}">Assign to:</label>
+        <select id="dept-${id}">
+          <option value="">--Select Department--</option>
+          <option value="Roads">Roads Dept</option>
+          <option value="Sanitation">Sanitation Dept</option>
+          <option value="Electrical">Electrical Dept</option>
+          <option value="Water">Water Dept</option>
+        </select>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button id="assign-${id}">Assign</button>
+          <button id="mark-${id}">Mark Resolved</button>
+        </div>
+      `;
+
+      // preselect assigned if exists
+      if (assigned) {
+        const sel = card.querySelector(`#dept-${id}`);
+        sel.value = assigned;
+      }
+
+      card.querySelector(`#assign-${id}`).addEventListener("click", async () => {
+        const dept = card.querySelector(`#dept-${id}`).value;
+        if (!dept) { alert("Please select department"); return; }
+        try {
+          await updateDoc(doc(db, "reportapp", id), { assignedTo: dept, status: "Assigned" });
+          alert("Assigned to " + dept);
+        } catch (e) {
+          console.error(e);
+          alert("Assign failed");
+        }
+      });
+
+      card.querySelector(`#mark-${id}`).addEventListener("click", async () => {
+        if (!confirm("Mark as resolved?")) return;
+        try {
+          await updateDoc(doc(db, "reportapp", id), { status: "Resolved", resolvedDate: serverTimestamp() });
+          alert("Marked resolved");
+        } catch (e) {
+          console.error(e);
+          alert("Failed to mark resolved");
+        }
+      });
+
+      return card;
+    }
+
+    // Show issues that are 'Submitted' or 'Assigned' or 'In Progress'
+    const q = query(collection(db, "reportapp"), where("status", "in", ["Submitted", "Assigned", "In Progress"]));
+
+    onSnapshot(q, (snapshot) => {
+      tasksContainer.innerHTML = "";
+      if (snapshot.empty) { tasksContainer.innerHTML = "<p>No tasks available.</p>"; return; }
+      snapshot.forEach(docSnap => {
+        const card = createTaskCard(docSnap);
+        tasksContainer.appendChild(card);
+      });
+    }, (err) => {
+      console.error("Task snapshot error:", err);
+      tasksContainer.innerHTML = "<p style='color:red;'>Failed to load tasks.</p>";
+    });
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>

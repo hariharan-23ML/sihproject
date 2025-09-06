@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report an Issue</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    form { display: flex; flex-direction: column; max-width: 400px; }
+    label { margin-top: 10px; font-weight: bold; }
+    input, textarea, button { margin-top: 5px; padding: 8px; }
+    button { background: blue; color: white; border: none; cursor: pointer; border-radius: 6px; }
+    button:hover { background: darkblue; }
+    .nav-btn { margin-top: 20px; background: green; }
+    .nav-btn:hover { background: darkgreen; }
+  </style>
+</head>
+<body>
+  <h1>Report an Issue</h1>
+  <form id="issueForm">
+    <label for="title">Issue Title</label>
+    <input type="text" id="title" required />
+
+    <label for="description">Description</label>
+    <textarea id="description" required></textarea>
+
+    <label for="location">Location</label>
+    <input type="text" id="location" required />
+
+    <button type="submit">Submit Issue</button>
+  </form>
+
+  <!-- 🟢 Navigation Button -->
+  <button class="nav-btn" onclick="window.location.href='reported-issues.html'">
+    Go to Reported Issues
+  </button>
+
+  <!-- Firebase Config -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.getElementById("issueForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let title = document.getElementById("title").value;
+      let description = document.getElementById("description").value;
+      let location = document.getElementById("location").value;
+
+      db.collection("issues").add({
+        title: title,
+        description: description,
+        location: location,
+        status: "Pending",
+        createdAt: new Date()
+      }).then(() => {
+        alert("Issue reported successfully!");
+        document.getElementById("issueForm").reset();
+      });
+    });
+  </script>
+</body>
+</html>
