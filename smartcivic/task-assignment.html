@@ -3,32 +3,215 @@
 <head>
   <meta charset="UTF-8" />
   <title>Task Assignment</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f9fafc;
+      color: #333;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 230px;
+      background: #1e8449;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      text-align: center;
+    }
+    .sidebar a {
+      display: block;
+      padding: 10px 15px;
+      color: #ecf0f1;
+      text-decoration: none;
+      margin: 6px 0;
+      border-radius: 8px;
+      transition: 0.3s;
+      font-size: 15px;
+    }
+    .sidebar a.active, .sidebar a:hover {
+      background: #145a32;
+    }
+    .logout-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: #e74c3c;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.3s;
+    }
+    .logout-btn:hover {
+      background: #c0392b;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 20px;
+    }
+    header h1 {
+      margin: 0 0 15px;
+      font-size: 26px;
+      font-weight: 600;
+      color: #145a32;
+    }
+
+    /* ML Controls */
+    #ml-control-bar {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    #ml-control-bar button {
+      padding: 10px 18px;
+      background: #1e8449;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #ml-control-bar button:hover {
+      background: #145a32;
+      transform: translateY(-2px);
+    }
+
+    /* Cards */
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #145a32;
+    }
+    .card p {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    /* ML Prediction Box */
+    .ml-prediction {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eafaf1;
+      border-left: 5px solid #1e8449;
+      font-size: 14px;
+    }
+    .ml-prediction p {
+      margin: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ml-prediction span {
+      font-weight: 600;
+      color: #145a32;
+    }
+
+    /* Card Buttons */
+    .card button {
+      flex: 1;
+      padding: 7px 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      background: #1e8449;
+      color: white;
+      transition: 0.3s;
+    }
+    .card button:hover {
+      background: #145a32;
+    }
+    .card-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
+  <!-- Sidebar -->
   <div class="sidebar">
-    <h2>Admin Panel</h2>
-    <a href="index.html">🏠 Dashboard</a>
-    <a href="reported-issues.html">🐞 Reported Issues</a>
-    <a href="live-map.html">🗺️ Live Map</a>
-    <a href="task-assignment.html" class="active">📋 Task Assignment</a>
-    <a href="resolved-reports.html">✅ Resolved Reports</a>
-    <a href="admin-settings.html">⚙️ Settings</a>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+    <div>
+      <h2>Admin Panel</h2>
+      <a href="index.html">🏠 Dashboard</a>
+      <a href="reported-issues.html">🐞 Reported Issues</a>
+      <a href="live-map.html">🗺️ Live Map</a>
+      <a href="task-assignment.html" class="active">📋 Task Assignment</a>
+      <a href="resolved-reports.html">✅ Resolved Reports</a>
+      <a href="admin-settings.html">⚙️ Settings</a>
+    </div>
+    <button class="logout-btn">Logout</button>
   </div>
 
+  <!-- Main -->
   <div class="main">
     <header><h1>Task Assignment</h1></header>
+
+    <!-- ML Controls -->
+    <div id="ml-control-bar">
+      <button id="analyze-tasks">⚡ Analyze Tasks</button>
+      <button id="auto-assign">🤖 Auto Assign</button>
+      <button id="reset">🔄 Reset</button>
+    </div>
+
+    <!-- Tasks -->
     <div class="container" id="tasks-container">
       <p>Loading tasks...</p>
     </div>
   </div>
 
+  <!-- Firebase + ML Logic -->
   <script type="module">
     import { db } from "./firebase.js";
     import { collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
     const tasksContainer = document.getElementById("tasks-container");
+
+    // Dummy ML model (replace with real one later)
+    function runMLPrediction(title) {
+      if (title.toLowerCase().includes("road")) {
+        return { workers: 5, time: "6 hrs", tools: "Jackhammer, Asphalt Mixer" };
+      } else if (title.toLowerCase().includes("light")) {
+        return { workers: 2, time: "2 hrs", tools: "Ladder, Electric Tester" };
+      } else if (title.toLowerCase().includes("garbage")) {
+        return { workers: 3, time: "3 hrs", tools: "Truck, Gloves, Masks" };
+      }
+      return { workers: 2, time: "4 hrs", tools: "General Toolkit" };
+    }
 
     function createTaskCard(docSnap) {
       const id = docSnap.id;
@@ -41,9 +224,14 @@
       const status = data.status || "Submitted";
       const assigned = data.assignedTo || "";
 
+      // ML prediction
+      const prediction = runMLPrediction(title);
+
       card.innerHTML = `
         <h3>${title}</h3>
-        <p>${location} – <strong>${status}</strong></p>
+        <p><strong>Location:</strong> ${location}</p>
+        <p><strong>Status:</strong> ${status}</p>
+
         <label for="dept-${id}">Assign to:</label>
         <select id="dept-${id}">
           <option value="">--Select Department--</option>
@@ -52,18 +240,24 @@
           <option value="Electrical">Electrical Dept</option>
           <option value="Water">Water Dept</option>
         </select>
-        <div style="display:flex;gap:8px;margin-top:8px;">
+
+        <div class="ml-prediction">
+          <p>👷 Workers Needed: <span>${prediction.workers}</span></p>
+          <p>⏱ Time Required: <span>${prediction.time}</span></p>
+          <p>🛠 Tools: <span>${prediction.tools}</span></p>
+        </div>
+
+        <div class="card-controls">
           <button id="assign-${id}">Assign</button>
           <button id="mark-${id}">Mark Resolved</button>
         </div>
       `;
 
-      // preselect assigned if exists
       if (assigned) {
-        const sel = card.querySelector(`#dept-${id}`);
-        sel.value = assigned;
+        card.querySelector(`#dept-${id}`).value = assigned;
       }
 
+      // Assign
       card.querySelector(`#assign-${id}`).addEventListener("click", async () => {
         const dept = card.querySelector(`#dept-${id}`).value;
         if (!dept) { alert("Please select department"); return; }
@@ -76,6 +270,7 @@
         }
       });
 
+      // Resolve
       card.querySelector(`#mark-${id}`).addEventListener("click", async () => {
         if (!confirm("Mark as resolved?")) return;
         try {
@@ -90,9 +285,7 @@
       return card;
     }
 
-    // Show issues that are 'Submitted' or 'Assigned' or 'In Progress'
     const q = query(collection(db, "reportapp"), where("status", "in", ["Submitted", "Assigned", "In Progress"]));
-
     onSnapshot(q, (snapshot) => {
       tasksContainer.innerHTML = "";
       if (snapshot.empty) { tasksContainer.innerHTML = "<p>No tasks available.</p>"; return; }
@@ -100,9 +293,6 @@
         const card = createTaskCard(docSnap);
         tasksContainer.appendChild(card);
       });
-    }, (err) => {
-      console.error("Task snapshot error:", err);
-      tasksContainer.innerHTML = "<p style='color:red;'>Failed to load tasks.</p>";
     });
   </script>
 

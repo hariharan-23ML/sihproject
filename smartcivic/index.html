@@ -38,7 +38,7 @@
     .header-left {
       display: flex;
       align-items: center;
-      gap: 0px; /* Changed here */
+      gap: 0px;
       flex: 1 1 auto;
       min-width: 220px;
     }
@@ -122,7 +122,10 @@
       border-radius: 12px;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
       transition: transform 0.3s ease;
-      cursor: default;
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+      color: inherit;
     }
 
     .card:hover {
@@ -191,48 +194,32 @@
   <!-- HEADER -->
   <header>
     <div class="header-left">
-      <!-- New logo -->
-     <!-- Custom SVG Logo -->
-<!-- Custom SVG Logo with green buildings -->
-<svg
-  id="custom-logo"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 64 64"
-  width="50"
-  height="50"
-  fill="none"
-  stroke="#1b5e20"
-  stroke-width="3"
-  stroke-linejoin="round"
-  stroke-linecap="round"
-  style="cursor:pointer; transition: transform 0.3s ease, filter 0.3s ease;"
->
-  <!-- Location pin base -->
-  <path
-    d="M32 58s20-18 20-34a20 20 0 1 0-40 0c0 16 20 34 20 34z"
-    fill="#c3d7af"
-    stroke="#1b5e20"
-  />
-  <!-- City skyline buildings in green -->
-  <rect x="24" y="26" width="6" height="12" fill= "hsl(0, 0%, 97%)" stroke=" hsl(78, 90%, 32%)" />
-  <rect x="32" y="22" width="6" height="16" fill=" hsl(0, 0%, 97%)" stroke=" hsl(78, 90%, 32%)" />
-  <rect x="40" y="28" width="6" height="10" fill=" hsl(0, 0%, 97%)" stroke=" hsl(78, 90%, 32%)" />
-  <!-- Leaf element -->
-  <path
-    d="M32 14c-6 3-8 8-8 8s3-1 6-4c2.5-2.3 4-6 4-6z"
-    fill="#c3d7af"
-    stroke="#1b5e20"
-  />
-</svg>
-
-<style>
-  #custom-logo:hover {
-    transform: scale(1.35);
-    filter: drop-shadow(0 0 5px hsl(77, 45%, 70%));
-  }
-</style>
-
-
+      <!-- Custom SVG Logo -->
+      <svg
+        id="custom-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 64 64"
+        width="50"
+        height="50"
+        fill="none"
+        stroke="#1b5e20"
+        stroke-width="3"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+        style="cursor:pointer; transition: transform 0.3s ease, filter 0.3s ease;"
+      >
+        <path d="M32 58s20-18 20-34a20 20 0 1 0-40 0c0 16 20 34 20 34z" fill="#c3d7af" stroke="#1b5e20"/>
+        <rect x="24" y="26" width="6" height="12" fill="hsl(0, 0%, 97%)" stroke="hsl(78, 90%, 32%)"/>
+        <rect x="32" y="22" width="6" height="16" fill="hsl(0, 0%, 97%)" stroke="hsl(78, 90%, 32%)"/>
+        <rect x="40" y="28" width="6" height="10" fill="hsl(0, 0%, 97%)" stroke="hsl(78, 90%, 32%)"/>
+        <path d="M32 14c-6 3-8 8-8 8s3-1 6-4c2.5-2.3 4-6 4-6z" fill="#c3d7af" stroke="#1b5e20"/>
+      </svg>
+      <style>
+        #custom-logo:hover {
+          transform: scale(1.35);
+          filter: drop-shadow(0 0 5px hsl(77, 45%, 70%));
+        }
+      </style>
       <h1>Admin Dashboard | Civic Issue Reporting</h1>
     </div>
 
@@ -251,46 +238,41 @@
     <h2>Dashboard Overview</h2>
 
     <div class="dashboard-grid">
-  <!-- Card 1: Reports -->
-  <a href="reported-issues.html" class="card" style="text-decoration:none; color:inherit;">
-    <i class="fas fa-bug"></i>
-    <h3>Reported Issues</h3>
-    <p>View and manage all reported civic issues with photos, descriptions, and locations.</p>
-  </a>
+      <a href="reported-issues.html" class="card">
+        <i class="fas fa-bug"></i>
+        <h3>Reported Issues</h3>
+        <p>View and manage all reported civic issues with photos, descriptions, and locations.</p>
+      </a>
 
-  <!-- Card 2: Map -->
-  <a href="live-map.html" class="card" style="text-decoration:none; color:inherit;">
-    <i class="fas fa-map-marked-alt"></i>
-    <h3>Live Map</h3>
-    <p>Visualize all active reports across the city with location markers.</p>
-  </a>
-      <!-- Card 3: Analytics -->
-      <div class="card">
+      <a href="live-map.html" class="card">
+        <i class="fas fa-map-marked-alt"></i>
+        <h3>Live Map</h3>
+        <p>Visualize all active reports across the city with location markers.</p>
+      </a>
+
+      <a href="analytics.html" class="card">
         <i class="fas fa-chart-line"></i>
         <h3>Analytics</h3>
         <p>Track department performance, response times, and citizen engagement over time.</p>
-      </div>
+      </a>
 
-      <!-- Card 4: Assign Tasks -->
-      <div class="card">
+      <a href="task-assignment.html" class="card">
         <i class="fas fa-tasks"></i>
         <h3>Task Assignment</h3>
         <p>Automatically route issues to the correct departments based on location and category.</p>
-      </div>
+      </a>
 
-      <!-- Card 5: Resolved Reports -->
-      <div class="card">
+      <a href="resolved-reports.html" class="card">
         <i class="fas fa-check-circle"></i>
         <h3>Resolved Reports</h3>
         <p>Monitor and verify all resolved civic issues, ensuring closure and citizen satisfaction.</p>
-      </div>
+      </a>
 
-      <!-- Card 6: Settings -->
-      <div class="card">
+      <a href="admin-settings.html" class="card">
         <i class="fas fa-cogs"></i>
         <h3>Admin Settings</h3>
         <p>Manage system configurations, department accounts, and platform preferences.</p>
-      </div>
+      </a>
     </div>
 
     <!-- FOOTER -->
