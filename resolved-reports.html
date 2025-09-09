@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resolved Reports</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="index.html">🏠 Dashboard</a>
+    <a href="reported-issues.html">🐞 Reported Issues</a>
+    <a href="live-map.html">🗺️ Live Map</a>
+    <a href="task-assignment.html">📋 Task Assignment</a>
+    <a href="resolved-reports.html" class="active">✅ Resolved Reports</a>
+    <a href="admin-settings.html">⚙️ Settings</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+    <header><h1>Resolved Reports</h1></header>
+    <div class="container" id="resolved-container">
+      <p>Loading resolved reports...</p>
+    </div>
+  </div>
+
+  <!-- Firebase imports -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    // Firebase config (use your actual config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGW0FVMF2gjDChPcbMbfdkY3zp9LaiISE",
+      authDomain: "my-civic-pro.firebaseapp.com",
+      projectId: "my-civic-pro",
+      storageBucket: "my-civic-pro.firebasestorage.app",
+      messagingSenderId: "457064350295",
+      appId: "1:457064350295:web:cfdbac285c7fe1e533d912"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const resolvedContainer = document.getElementById("resolved-container");
+
+    // Format Firestore timestamp
+    function formatTimestamp(ts) {
+      if (!ts) return "Unknown date";
+      try {
+        if (ts.toDate) return ts.toDate().toLocaleString();
+        if (ts.seconds) return new Date(ts.seconds * 1000).toLocaleString();
+        return new Date(ts).toLocaleString();
+      } catch {
+        return "Unknown date";
+      }
+    }
+
+    // Create card for each resolved report
+    function createResolvedCard(docSnap) {
+      const data = docSnap.data();
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const resolvedDate = formatTimestamp(data.resolvedDate);
+      const location = data.location ? `${data.location.lat || ""}, ${data.location.lng || ""}` : "Unknown location";
+
+      card.innerHTML = `
+        <h3>${data.title || "Untitled"}</h3>
+        <p><strong>Resolved on:</strong> ${resolvedDate}</p>
+        <p><strong>Location:</strong> ${location}</p>
+        <p>${data.description || ""}</p>
+        ${data.imageUrl ? `<button id="view-${docSnap.id}">View Image</button>` : ""}
+      `;
+
+      if (data.imageUrl) {
+        card.querySelector(`#view-${docSnap.id}`).addEventListener("click", () => {
+          window.open(data.imageUrl, "_blank");
+        });
+      }
+
+      return card;
+    }
+
+    // Query only resolved reports
+    const q = query(collection(db, "reportapp"), where("status", "==", "Resolved"));
+
+    // Real-time listener
+    onSnapshot(q, (snapshot) => {
+      resolvedContainer.innerHTML = "";
+      if (snapshot.empty) {
+        resolvedContainer.innerHTML = "<p>No resolved reports yet.</p>";
+        return;
+      }
+      snapshot.forEach(docSnap => resolvedContainer.appendChild(createResolvedCard(docSnap)));
+    }, (err) => {
+      console.error("Resolved snapshot error:", err);
+      resolvedContainer.innerHTML = "<p style='color:red;'>Failed to load resolved reports.</p>";
+    });
+  </script>
+
+  <!-- Logout script -->
+  <script src="script.js"></script>
+</body>
+</html>

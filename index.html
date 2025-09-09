@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Dashboard | Civic Issue Reporting</title>
+
+<!-- Google Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f4f6f8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: #2e7d32;
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 220px;
+}
+
+.header-left svg {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.header-left svg:hover {
+  transform: scale(1.35);
+  filter: drop-shadow(0 0 5px hsl(77, 45%, 70%));
+}
+
+header h1 {
+  font-size: 22px;
+  white-space: nowrap;
+}
+
+nav {
+  display: flex;
+  gap: 20px;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-width: 180px;
+}
+
+nav a {
+  color: #d1e7d1;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav a:hover, nav a:focus {
+  background-color: #1b5e20;
+  color: #fff;
+  outline: none;
+}
+
+.logout-btn {
+  background-color: #ffffff;
+  color: #2e7d32;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background-color: #e8f5e9;
+}
+
+.container {
+  padding: 40px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  flex-grow: 1;
+}
+
+.card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.card p {
+  font-size: 14px;
+  color: #555;
+}
+
+.card i {
+  font-size: 28px;
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.85em;
+  color: #777;
+  padding: 20px 40px;
+  background-color: #e1e9e2;
+  border-top: 1px solid #c2d6c2;
+  margin-top: 40px;
+  user-select: none;
+}
+
+@media screen and (max-width: 600px) {
+  header {
+    justify-content: center;
+    gap: 15px;
+  }
+  nav {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .header-left {
+    justify-content: center;
+  }
+  .logout-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+</style>
+
+<!-- ACCESS CONTROL -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+      alert("You are not authorized to access this page. Please login first.");
+      window.location.href = "login.html";
+    }
+  });
+
+  function logout() {
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "login.html";
+  }
+</script>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <!-- Custom SVG Logo -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#1b5e20" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M32 58s20-18 20-34a20 20 0 1 0-40 0c0 16 20 34 20 34z" fill="#c3d7af" stroke="#1b5e20"/>
+      <rect x="24" y="26" width="6" height="12" fill="#f1f1f1" stroke="#4caf50"/>
+      <rect x="32" y="22" width="6" height="16" fill="#f1f1f1" stroke="#4caf50"/>
+      <rect x="40" y="28" width="6" height="10" fill="#f1f1f1" stroke="#4caf50"/>
+      <path d="M32 14c-6 3-8 8-8 8s3-1 6-4c2.5-2.3 4-6 4-6z" fill="#c3d7af" stroke="#1b5e20"/>
+    </svg>
+    <h1>Admin Dashboard | Civic Issue Reporting</h1>
+  </div>
+
+  <nav>
+    <a href="dashboard.html">Home</a>
+    <a href="#">About Us</a>
+    <a href="#">Vision</a>
+    <a href="#">Contact Us</a>
+  </nav>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+  <h2>Dashboard Overview</h2>
+
+  <div class="dashboard-grid">
+    <a href="reported-issues.html" class="card">
+      <i class="fas fa-bug"></i>
+      <h3>Reported Issues</h3>
+      <p>View and manage all reported civic issues with photos, descriptions, and locations.</p>
+    </a>
+
+    <a href="live-map.html" class="card">
+      <i class="fas fa-map-marked-alt"></i>
+      <h3>Live Map</h3>
+      <p>Visualize all active reports across the city with location markers.</p>
+    </a>
+
+    <a href="analytics.html" class="card">
+      <i class="fas fa-chart-line"></i>
+      <h3>Analytics</h3>
+      <p>Track department performance, response times, and citizen engagement over time.</p>
+    </a>
+
+    <a href="task-assignment.html" class="card">
+      <i class="fas fa-tasks"></i>
+      <h3>Task Assignment</h3>
+      <p>Automatically route issues to the correct departments based on location and category.</p>
+    </a>
+
+    <a href="resolved-reports.html" class="card">
+      <i class="fas fa-check-circle"></i>
+      <h3>Resolved Reports</h3>
+      <p>Monitor and verify all resolved civic issues, ensuring closure and citizen satisfaction.</p>
+    </a>
+
+    <a href="settings.html" class="card">
+      <i class="fas fa-cogs"></i>
+      <h3>Admin Settings</h3>
+      <p>Manage system configurations, department accounts, and platform preferences.</p>
+    </a>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Government of Jharkhand | Department of Higher & Technical Education
+</footer>
+
+</body>
+</html>
