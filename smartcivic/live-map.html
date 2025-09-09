@@ -8,17 +8,20 @@
   <style>#map { height: 500px; width: 100%; border-radius:12px; }</style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>Admin Panel</h2>
-    <a href="index.html">🏠 Dashboard</a>
-    <a href="reported-issues.html">🐞 Reported Issues</a>
-    <a href="live-map.html" class="active">🗺️ Live Map</a>
-    <a href="task-assignment.html">📋 Task Assignment</a>
-    <a href="resolved-reports.html">✅ Resolved Reports</a>
-    <a href="admin-settings.html">⚙️ Settings</a>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <h2><i class="fas fa-tools"></i> Admin Panel</h2>
+      <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="reported-issues.html"><i class="fas fa-bug"></i> Reported Issues</a>
+      <a href="live-map.html"><i class="fas fa-map"></i> Live Map</a>
+      <a href="analytics.html"><i class="fas fa-chart-line"></i> Analytics</a>
+      <a href="task-assignment.html"><i class="fas fa-tasks"></i> Task Assignment</a>
+      <a href="resolved-reports.html" class="active"><i class="fas fa-check-circle"></i> Resolved Reports</a>
+      <a href="admin-setings.html"><i class="fas fa-cogs"></i> Settings</a>
+    </div>
     <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
+  </aside>
   <div class="main">
     <header><h1>Live Map</h1></header>
     <div class="container">

@@ -1,398 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Admin Panel - Reported Issues & Settings</title>
-<style>
-  body {
-    margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f4f6f8;
-    color: #333;
-    display: flex;
-  }
-
-  /* Sidebar */
-  .sidebar {
-    width: 240px;
-    background: linear-gradient(180deg, #1e8449, #145a32);
-    color: white;
-    min-height: 100vh;
-    padding: 25px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-  }
-  .sidebar h2 {
-    margin: 0 0 25px;
-    font-size: 22px;
-    text-align: center;
-    font-weight: 600;
-  }
-  .sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    color: #ecf0f1;
-    text-decoration: none;
-    margin: 8px 0;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    font-size: 15px;
-    cursor: pointer;
-  }
-  .sidebar a.active, .sidebar a:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateX(6px);
-  }
-  .logout-btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background: #e74c3c;
-    color: white;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  }
-  .logout-btn:hover {
-    background: #c0392b;
-    transform: translateY(-2px);
-  }
-
-  /* Main */
-  .main {
-    flex: 1;
-    padding: 20px;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 26px;
-    font-weight: 600;
-    color: #145a32;
-  }
-
-  /* Tabs for main content */
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* Suggestion Box */
-  #ml-suggestion-box {
-    margin: 20px 0;
-    padding: 22px;
-    border-radius: 18px;
-    background: rgba(46, 204, 113, 0.1);
-    border: 2px solid rgba(46, 204, 113, 0.3);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    display: none;
-  }
-  #ml-suggestion-box h2 {
-    margin: 0 0 10px;
-    font-size: 20px;
-    color: #145a32;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  #ml-suggestion-box p {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 500;
-    color: #2c3e50;
-  }
-
-  /* Cards */
-  .container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 18px;
-  }
-  .card {
-    background: white;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
-  }
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  }
-  .card h3 {
-    margin: 0 0 8px;
-    font-size: 18px;
-    display: flex;
-    justify-content: space-between;
-    color: #145a32;
-  }
-  .card p { margin: 4px 0; font-size: 14px; }
-
-  .priority-badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .priority-high { background: #fdecea; color: #c0392b; }
-  .priority-medium { background: #fff4e5; color: #e67e22; }
-  .priority-low { background: #eafaf1; color: #145a32; }
-
-  .card-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-  .card-actions button, .card-actions select {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: 0.3s;
-  }
-  .view-btn { background: #3498db; color: white; }
-  .view-btn:hover { background: #217dbb; }
-  .assign-btn { background: #1e8449; color: white; }
-  .assign-btn:hover { background: #145a32; }
-  .resolve-btn { background: #e74c3c; color: white; }
-  .resolve-btn:hover { background: #c0392b; }
-  .dept-select { background: #f4f6f7; border: 1px solid #ccc; }
-
-  .highlight-suggested {
-    border: 2px solid #1e8449;
-    box-shadow: 0 0 18px rgba(46,204,113,0.6);
-  }
-
-  /* Modal */
-  .modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-  }
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 14px;
-    width: 400px;
-    max-width: 90%;
-    text-align: center;
-  }
-  .close-modal {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 15px;
-  }
-
-  /* Settings form */
-  .settings-form {
-    background: white;
-    padding: 20px;
-    border-radius: 14px;
-    max-width: 500px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  }
-  .settings-form input, .settings-form select {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  .settings-form button {
-    padding: 10px 15px;
-    background: #1e8449;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  .settings-form button:hover { background: #145a32; }
-
-</style>
+  <meta charset="UTF-8">
+  <title>Admin Settings</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<div class="sidebar">
-  <div>
+  <!-- Sidebar -->
+  <div class="sidebar">
     <h2>Admin Panel</h2>
-    <a onclick="openTab('issues')" class="active">🐞 Reported Issues</a>
-    <a onclick="openTab('settings')">⚙️ Settings</a>
-    <a onclick="alert('Dashboard coming soon!')">🏠 Dashboard</a>
-    <a onclick="alert('Live Map coming soon!')">🗺️ Live Map</a>
-    <a onclick="alert('Task Assignment coming soon!')">📋 Task Assignment</a>
-    <a onclick="alert('Resolved Reports coming soon!')">✅ Resolved Reports</a>
+    <a href="./index.html">🏠 Dashboard</a>
+    <a href="./reported-issues.html">🐞 Reported Issues</a>
+    <a href="./live-map.html">🗺 Live Map</a>
+    <a href="./task-assignment.html">📋 Task Assignment</a>
+    <a href="./resolved-reports.html">✅ Resolved Reports</a>
+    <a href="./admin-setings.html" class="active">⚙ Settings</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
-  <button class="logout-btn" onclick="alert('Logged out!')">Logout</button>
-</div>
 
-<div class="main">
-  <header><h1>Admin Panel</h1></header>
-
-  <!-- Issues Tab -->
-  <div id="issues" class="tab-content active">
-    <div id="ml-suggestion-box">
-      <h2>🤖 ML Suggestion</h2>
-      <p>Loading best task to execute first...</p>
-    </div>
-
-    <div class="container" id="issues-container">
-      <div class="card" data-priority="high" data-time="202509070930">
-        <h3>Pothole on Main Road <span class="priority-badge priority-high">🔴 High</span></h3>
-        <p><strong>Status:</strong> Submitted | <strong>Assigned To:</strong> Not assigned</p>
-        <p><strong>Location:</strong> 12.97, 77.59</p>
-        <p><strong>Reported On:</strong> 2025-09-07 09:30</p>
-        <p>Large pothole near school, causing traffic jam.</p>
-        <div class="card-actions">
-          <select class="dept-select">
-            <option value="">--Select Dept--</option>
-            <option>Roads</option>
-            <option>Sanitation</option>
-            <option>Electrical</option>
-            <option>Water</option>
-          </select>
-          <button class="assign-btn" onclick="openModal('Assigned!')">Assign</button>
-          <button class="resolve-btn" onclick="openModal('Resolved!')">Resolve</button>
-          <button class="view-btn" onclick="openModal('View Image')">View Image</button>
-        </div>
+  <!-- Main Content -->
+  <div class="main">
+    <header><h1>Admin Settings</h1></header>
+    <div class="container">
+      <!-- Profile Settings -->
+      <div class="card">
+        <h3>Profile</h3>
+        <form id="profileForm">
+          <input type="text" id="adminName" placeholder="Admin Name"><br>
+          <input type="email" id="adminEmail" placeholder="Admin Email"><br>
+          <input type="password" id="newPassword" placeholder="New Password"><br>
+          <button type="submit">Update Profile</button>
+        </form>
+        <p id="profileMsg"></p>
       </div>
-      <div class="card" data-priority="medium" data-time="202509071015">
-        <h3>Streetlight Not Working <span class="priority-badge priority-medium">🟡 Medium</span></h3>
-        <p><strong>Status:</strong> Submitted | <strong>Assigned To:</strong> Not assigned</p>
-        <p><strong>Location:</strong> 12.95, 77.58</p>
-        <p><strong>Reported On:</strong> 2025-09-07 10:15</p>
-        <p>Streetlight near park not working for 3 days.</p>
-        <div class="card-actions">
-          <select class="dept-select">
-            <option value="">--Select Dept--</option>
-            <option>Roads</option>
-            <option>Sanitation</option>
-            <option>Electrical</option>
-            <option>Water</option>
-          </select>
-          <button class="assign-btn" onclick="openModal('Assigned!')">Assign</button>
-          <button class="resolve-btn" onclick="openModal('Resolved!')">Resolve</button>
-          <button class="view-btn" onclick="openModal('View Image')">View Image</button>
-        </div>
-      </div>
-      <div class="card" data-priority="low" data-time="202509071100">
-        <h3>Garbage Collection Delay <span class="priority-badge priority-low">🟢 Low</span></h3>
-        <p><strong>Status:</strong> Submitted | <strong>Assigned To:</strong> Not assigned</p>
-        <p><strong>Location:</strong> 12.96, 77.60</p>
-        <p><strong>Reported On:</strong> 2025-09-07 11:00</p>
-        <p>Garbage not collected from street since yesterday.</p>
-        <div class="card-actions">
-          <select class="dept-select">
-            <option value="">--Select Dept--</option>
-            <option>Roads</option>
-            <option>Sanitation</option>
-            <option>Electrical</option>
-            <option>Water</option>
-          </select>
-          <button class="assign-btn" onclick="openModal('Assigned!')">Assign</button>
-          <button class="resolve-btn" onclick="openModal('Resolved!')">Resolve</button>
-          <button class="view-btn" onclick="openModal('View Image')">View Image</button>
-        </div>
+
+      <!-- System Settings -->
+      <div class="card">
+        <h3>System Settings</h3>
+        <form id="deptForm">
+          <input type="text" id="deptName" placeholder="Department Name" required>
+          <button type="submit">Add Department</button>
+        </form>
+        <ul id="deptList"></ul>
       </div>
     </div>
   </div>
 
-  <!-- Settings Tab -->
-  <div id="settings" class="tab-content">
-    <h2>Admin Settings</h2>
-    <form class="settings-form" onsubmit="event.preventDefault(); alert('Settings Saved!');">
-      <label>Admin Name</label>
-      <input type="text" placeholder="Enter admin name" required>
-      <label>Email</label>
-      <input type="email" placeholder="Enter email" required>
-      <label>Password</label>
-      <input type="password" placeholder="Enter new password" required>
-      <label>Notification Preferences</label>
-      <select>
-        <option>Email Only</option>
-        <option>SMS Only</option>
-        <option>Email & SMS</option>
-      </select>
-      <button type="submit">Save Settings</button>
-    </form>
-  </div>
+  <!-- Firebase & Admin Logic -->
+  <script type="module">
+    import { auth, db } from "./firebase.js";
+    import { updatePassword, updateEmail } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-</div>
-
-<!-- Modal -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <p id="modal-text"></p>
-    <button class="close-modal" onclick="closeModal()">Close</button>
-  </div>
-</div>
-
-<script>
-  // ML Suggestion
-  function analyzeMLSuggestion() {
-    const cards = document.querySelectorAll(".card");
-    const priorityOrder = { high: 1, medium: 2, low: 3 };
-    let bestTask = null;
-    let bestScore = Infinity;
-
-    cards.forEach(card => {
-      const pr = card.dataset.priority;
-      const time = parseInt(card.dataset.time);
-      const score = priorityOrder[pr] * 10000000000 + time;
-      if (score < bestScore) {
-        bestScore = score;
-        bestTask = card;
+    // Profile Update
+    const profileForm = document.getElementById("profileForm");
+    const profileMsg = document.getElementById("profileMsg");
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) {
+        profileMsg.textContent = "❌ No authenticated user.";
+        return;
+      }
+      const email = document.getElementById("adminEmail").value.trim();
+      const newPass = document.getElementById("newPassword").value;
+      try {
+        if (email) await updateEmail(user, email);
+        if (newPass) await updatePassword(user, newPass);
+        profileMsg.textContent = "✅ Profile updated successfully!";
+      } catch (err) {
+        profileMsg.textContent = "❌ Error: " + (err.message || err);
       }
     });
 
-    if (bestTask) {
-      const box = document.getElementById("ml-suggestion-box");
-      box.style.display = "block";
-      box.querySelector("p").textContent =
-        "🚨 Execute this first: " + bestTask.querySelector("h3").innerText;
-      bestTask.classList.add("highlight-suggested");
-    }
-  }
+    // Department Management
+    const deptForm = document.getElementById("deptForm");
+    const deptList = document.getElementById("deptList");
+    deptForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const deptName = document.getElementById("deptName").value.trim();
+      if (!deptName) return;
+      try {
+        await addDoc(collection(db, "departments"), { name: deptName });
+        document.getElementById("deptName").value = "";
+      } catch (err) {
+        console.error("Add department error:", err);
+        alert("Failed to add department");
+      }
+    });
 
-  window.onload = analyzeMLSuggestion;
+    // Live Department List
+    onSnapshot(collection(db, "departments"), (snap) => {
+      deptList.innerHTML = "";
+      if (snap.empty) {
+        deptList.innerHTML = "<li>No departments yet</li>";
+        return;
+      }
+      snap.forEach((d) => {
+        const li = document.createElement("li");
+        li.textContent = d.data().name;
+        deptList.appendChild(li);
+      });
+    });
+  </script>
 
-  // Modal
-  function openModal(text) {
-    document.getElementById("modal-text").textContent = text;
-    document.getElementById("modal").style.display = "flex";
-  }
-  function closeModal() {
-    document.getElementById("modal").style.display = "none";
-  }
-
-  // Tab navigation
-  function openTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(tabName).classList.add('active');
-  }
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
